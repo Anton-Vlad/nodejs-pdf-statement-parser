@@ -3,7 +3,7 @@ const fs = require("fs/promises");
 const pdf = require("pdf-parse");
 const {
   btStatementParse,
-  btExtractStatementDate,
+  btExtractStatementDates,
   btIdentifyBank,
   btExtractCurrency,
   btExtractInitialBalance,
@@ -15,6 +15,14 @@ const {
   ingExtractInitialBalance,
   ingExtractFinalBalance,
 } = require("./ingHelpers");
+const {
+  revIdentifyBank,
+  revExtractCurrency,
+  revExtractStatementDate,
+  revExtractInitialBalance,
+  revExtractFinalBalance,
+  revStatementParse
+} = require("./revHelpers");
 
 function getStatementBank(data) {
   if (ingIdentifyBank(data)) {
@@ -23,7 +31,7 @@ function getStatementBank(data) {
   if (btIdentifyBank(data)) {
     return "BT";
   }
-  if (data.includes("REVOLT21")) {
+  if (revIdentifyBank(data)) {
     return "REV";
   }
   return null;
@@ -32,7 +40,10 @@ function getStatementBank(data) {
 function extractStatementDates(text, bank) {
   switch (bank) {
     case "BT":
-      return btExtractStatementDate(text);
+      return btExtractStatementDates(text);
+      break;
+    case "REV":
+      return revExtractStatementDate(text);
       break;
 
     default:
@@ -46,6 +57,9 @@ function extractCurrency(text, bank) {
     case "BT":
       return btExtractCurrency(text);
       break;
+    case "REV":
+      return revExtractCurrency(text);
+      break;
 
     default:
       return "Unknown bank";
@@ -53,33 +67,31 @@ function extractCurrency(text, bank) {
   }
 }
 
-function extractInitialBalance(text, bank) {
+function extractInitialBalance(text, bank, currency) {
   switch (bank) {
     case "ING":
       return ingExtractInitialBalance(text);
-      break;
     case "BT":
       return btExtractInitialBalance(text);
-      break;
+    case "REV":
+      return revExtractInitialBalance(text, currency);
 
     default:
       return null;
-      break;
   }
 }
 
-function extractFinalBalance(text, bank) {
+function extractFinalBalance(text, bank, currency) {
   switch (bank) {
     case "ING":
       return ingExtractFinalBalance(text);
-      break;
     case "BT":
       return btExtractFinalBalance(text);
-      break;
+    case "REV":
+      return revExtractFinalBalance(text, currency);
 
     default:
       return null;
-      break;
   }
 }
 
@@ -99,6 +111,8 @@ function parseTransactions(data, bank, currency = "RON", numpages = 1) {
       return ingStatementParse(data, currency);
     case "BT":
       return btStatementParse(data, currency);
+    case "REV":
+      return revStatementParse(data, currency);
 
     default:
       return false;
@@ -138,11 +152,13 @@ const parseStatement = async (filePath, fileName) => {
   const statementCurrency = extractCurrency(fileData.text, statementBank);
   const statementInitialBalance = extractInitialBalance(
     fileData.text,
-    statementBank
+    statementBank,
+    statementCurrency
   );
   const statementFinalBalance = extractFinalBalance(
     fileData.text,
-    statementBank
+    statementBank,
+    statementCurrency
   );
 
   const transactions = parseTransactions(

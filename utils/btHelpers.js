@@ -49,18 +49,12 @@ function btExtractCurrency(text) {
     if (currencyMatch) {
         return currencyMatch[1].trim().toUpperCase();
     }
-    
-    // if (lines[i].startsWith("EXTRAS CONT")) {
-    //   if (lines[i + 2]) {
-    //     output = lines[i + 2].trim().slice(0, 3).toUpperCase();
-    //   }
-    // }
   }
 
   return null;
 }
 
-function btExtractStatementDate(text) {
+function btExtractStatementDates(text) {
   const dateRegex = /(\d{2})\/(\d{2})\/(\d{4}) - (\d{2})\/(\d{2})\/(\d{4})/;
   const lines = text
     .split("\n")
@@ -254,6 +248,6 @@ module.exports = {
   btExtractFinalBalance,
   btExtractCurrency,
   btIdentifyBank,
-  btExtractStatementDate,
+  btExtractStatementDates,
   btStatementParse
 };
