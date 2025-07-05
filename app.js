@@ -2,17 +2,18 @@ const path = require("path");
 const fs = require("fs/promises");
 const pdf = require("pdf-parse");
 
-const { parseStatement } = require("./utils/statementHelpers");
+const { parseStatement, analyzeFolder } = require("./utils/statementHelpers");
 
 async function main() {
     const args = process.argv.slice(2);
 
     if (args[1] === '--folder' && args[0]) {
-        const folderPath = args[1];
+        const folderPath = args[0];
         const outputPath = path.join(folderPath, 'transactions.json');
 
         try {
-            const results = {'mock': 'results'}; //await analyzeFolder(folderPath);
+            console.log(`Analyzing folder: ${folderPath}`);
+            const results = await analyzeFolder(folderPath);
             await fs.writeFile(outputPath, JSON.stringify(results, null, 2), 'utf8');
             console.log(`Summary written to ${outputPath}`);
         } catch (err) {

@@ -1,7 +1,8 @@
 function btIdentifyBank(text) {
   if (
     text.includes("J12 / 4155 / 1993 • R.B. - P.J.R - 12 - 019") ||
-    text.includes("J12/4155/1993 • R.B. - P.J.R-12-019")
+    text.includes("J12/4155/1993 • R.B. - P.J.R-12-019") || 
+    text.includes("Nr. Inreg. Registrul Comertului: J1993004155124")
   ) {
     return "BT";
   }
@@ -41,17 +42,22 @@ function btExtractCurrency(text) {
     .map((l) => l.trim())
     .filter(Boolean);
 
-  let output = null;
+  const currencyRegex = /([A-Z]{3})Cod IBAN:/i;
 
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("EXTRAS CONT")) {
-      if (lines[i + 2]) {
-        output = lines[i + 2].trim().slice(0, 3).toUpperCase();
-      }
+    const currencyMatch = lines[i].match(currencyRegex);
+    if (currencyMatch) {
+        return currencyMatch[1].trim().toUpperCase();
     }
+    
+    // if (lines[i].startsWith("EXTRAS CONT")) {
+    //   if (lines[i + 2]) {
+    //     output = lines[i + 2].trim().slice(0, 3).toUpperCase();
+    //   }
+    // }
   }
 
-  return output;
+  return null;
 }
 
 function btExtractStatementDate(text) {
@@ -105,9 +111,9 @@ function btStatementParse(text, currency = 'RON') {
 
     const dateRegex = /(\d{2})\/(\d{2})\/(\d{4})/;
     const amountRegex = /^\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})$/;
-    const refRegex = /^REF[:\s]/i;
+    const refRegex = /^REF[:.\s]/i;
     const valueLineRegex = /valoare tranzactie: ([\d.,]+)\s+([A-Z]{3})/i;
-    const locationRegex = /TID[:\s]+\S+\s+(.+?)\s+(?:RO|ROM|RON|RRN)\b/;
+    const locationRegex = /(?:TID|MID)[:\s]+\S+\s+(.+?)\s+(?:RO|ROM|RON|RRN)\b/;
 
     let currentDate = null;
     let current = null;
@@ -126,8 +132,7 @@ function btStatementParse(text, currency = 'RON') {
             const tokens = line.split(/\s+/);
             for (let t of tokens) {
                 if (amountRegex.test(t)) {
-                    const parsed = t; // parseFloat(t.replace(/\./g, '').replace(',', '.'));
-                    if (!isNaN(parsed)) return parsed;
+                    return t; // parseFloat(t.replace(/\./g, '').replace(',', '.'));
                 }
             }
         }
@@ -211,7 +216,7 @@ function btStatementParse(text, currency = 'RON') {
                     current.amount = nextLine; //parseFloat(nextLine.trim().replace(/\./g, '').replace(',', '.'));
                 }
 
-                current.reference = line.replace(/^REF[:\s]+/i, '').trim();
+                current.reference = line.replace(refRegex, '').trim();
                 continue;
             }
 

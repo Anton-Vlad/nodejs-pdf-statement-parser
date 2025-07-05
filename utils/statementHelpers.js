@@ -1,3 +1,4 @@
+const path = require("path");
 const fs = require("fs/promises");
 const pdf = require("pdf-parse");
 const {
@@ -105,6 +106,26 @@ function parseTransactions(data, bank, currency = "RON", numpages = 1) {
   }
 }
 
+function mergeMetaArray(metaArray) {
+  if (!Array.isArray(metaArray) || metaArray.length === 0) return null;
+
+  // Sort by startDate ascending
+  const sorted = metaArray
+    .slice()
+    .sort((a, b) => new Date(a.dates.startDate) - new Date(b.dates.startDate));
+
+  return {
+    bank: sorted[0].bank,
+    currency: sorted[0].currency,
+    dates: {
+      startDate: sorted[0].dates.startDate,
+      endDate: sorted[sorted.length - 1].dates.endDate,
+    },
+    initialBalance: sorted[0].initialBalance,
+    finalBalance: sorted[sorted.length - 1].finalBalance,
+  };
+}
+
 const parseStatement = async (filePath, fileName) => {
   let dataBuffer = await fs.readFile(filePath);
   const fileData = await pdf(dataBuffer);
@@ -123,7 +144,6 @@ const parseStatement = async (filePath, fileName) => {
     fileData.text,
     statementBank
   );
-  
 
   const transactions = parseTransactions(
     fileData.text,
@@ -154,11 +174,49 @@ const parseStatement = async (filePath, fileName) => {
       finalBalance: statementFinalBalance,
     },
     transactions: transactions,
-  }
+  };
 
   return out;
 };
 
+const analyzeFolder = async (folderPath) => {
+  const entries = await fs.readdir(folderPath, { withFileTypes: true });
+  const pdfFiles = entries
+    .filter(
+      (entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".pdf")
+    )
+    .map((entry) => path.join(folderPath, entry.name));
+
+  const results = {};
+
+  for (const file of pdfFiles) {
+    try {
+      const fileResult = await parseStatement(file, "folder_file");
+
+      // Merge results into the main results object
+      for (const [iban, data] of Object.entries(fileResult)) {
+        if (!results[iban]) {
+          results[iban] = {
+            meta: {},
+            meta_array: [],
+            transactions: [],
+          };
+        }
+        results[iban].meta_array.push(data.meta);
+        results[iban].transactions.push(...data.transactions);
+        results[iban].meta = mergeMetaArray(results[iban].meta_array);
+      }
+
+      console.log(`Parsed: ${file}`);
+    } catch (err) {
+      console.error(`Error parsing ${file}: ${err.message}`);
+    }
+  }
+
+  return results;
+};
+
 module.exports = {
   parseStatement,
+  analyzeFolder,
 };
