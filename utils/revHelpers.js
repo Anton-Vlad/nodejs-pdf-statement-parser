@@ -51,7 +51,7 @@ function revExtractCurrency(text) {
   return null;
 }
 
-function revExtractStatementDate(text) {
+function revExtractStatementDates(text) {
   const dateRangeRegex =
     /Tranzacții din cont de la (\d{1,2}) (\w+) (\d{4}) până la (\d{1,2}) (\w+) (\d{4})/i;
   const lines = text
@@ -353,7 +353,7 @@ function revStatementParse(text, currency = "RON") {
 module.exports = {
   revIdentifyBank,
   revExtractCurrency,
-  revExtractStatementDate,
+  revExtractStatementDates,
   revExtractInitialBalance,
   revExtractFinalBalance,
   revStatementParse,

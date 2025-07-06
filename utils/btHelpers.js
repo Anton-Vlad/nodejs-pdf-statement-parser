@@ -16,11 +16,12 @@ function btIdentifyBank(text) {
 function btExtractInitialBalance(text) {
   // Define a regular expression pattern to identify the line with "SOLD ANTERIOR" and extract the following amount
   const balanceRegex = /SOLD ANTERIOR\s*\n(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/;
-  const match2 = text.match(balanceRegex);
-  if (match2 && match2[1]) {
-    // Replace commas used as thousand separators (if any) and convert the string to a float number
-    const balance = parseFloat(match2[1].replace(/,/g, ""));
-    return balance;
+  const foundMatches = text.match(balanceRegex);
+  if (foundMatches && foundMatches[1]) {
+    // // Replace commas used as thousand separators (if any) and convert the string to a float number
+    // const balance = parseFloat(match2[1].replace(/,/g, ""));
+    // return balance;
+    return foundMatches[1];
   }
   return null; // Return null if no match is found or if parsing fails
 }
@@ -29,12 +30,13 @@ function btExtractFinalBalance(text) {
   // Define a regular expression pattern to identify the line with "SOLD FINAL CONT" and capture the following amount
   const balanceRegex =
     /SOLD FINAL CONT\s*\n(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/;
-  const match2 = text.match(balanceRegex);
-  if (match2 && match2[1]) {
+  const foundMatches = text.match(balanceRegex);
+  if (foundMatches && foundMatches[1]) {
     // Normalize the captured amount to handle different thousand separators and decimal points
-    const normalizedAmount = match2[1].replace(/,/g, "").replace(/\./g, "");
-    const balance = parseFloat(normalizedAmount) / 100; // Convert string to float and adjust for cents
-    return balance;
+    // const normalizedAmount = match2[1].replace(/,/g, "").replace(/\./g, "");
+    // const balance = parseFloat(normalizedAmount) / 100; // Convert string to float and adjust for cents
+    // return balance;
+    return foundMatches[1];
   }
   return null; // Return null if no match is found
 }

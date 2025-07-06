@@ -14,11 +14,13 @@ const {
   ingIdentifyBank,
   ingExtractInitialBalance,
   ingExtractFinalBalance,
+  ingExtractCurrency,
+  ingExtractStatementDates
 } = require("./ingHelpers");
 const {
   revIdentifyBank,
   revExtractCurrency,
-  revExtractStatementDate,
+  revExtractStatementDates,
   revExtractInitialBalance,
   revExtractFinalBalance,
   revStatementParse
@@ -39,28 +41,25 @@ function getStatementBank(data) {
 
 function extractStatementDates(text, bank) {
   switch (bank) {
+    case "ING":
+      return ingExtractStatementDates(text);
     case "BT":
       return btExtractStatementDates(text);
-      break;
     case "REV":
-      return revExtractStatementDate(text);
-      break;
-
+      return revExtractStatementDates(text);
     default:
       return "Unknown bank";
-      break;
   }
 }
 
 function extractCurrency(text, bank) {
   switch (bank) {
+    case "ING":
+      return ingExtractCurrency(text);
     case "BT":
       return btExtractCurrency(text);
-      break;
     case "REV":
       return revExtractCurrency(text);
-      break;
-
     default:
       return "Unknown bank";
       break;
