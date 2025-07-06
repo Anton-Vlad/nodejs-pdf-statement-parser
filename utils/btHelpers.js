@@ -1,3 +1,6 @@
+const TYPE_INCOME = "income";
+const TYPE_EXPENSE = "expense";
+
 function btIdentifyBank(text) {
   if (
     text.includes("J12 / 4155 / 1993 • R.B. - P.J.R - 12 - 019") ||
@@ -178,7 +181,7 @@ function btStatementParse(text, currency = 'RON') {
                 date: currentDate,
                 amount: null,
                 currency,
-                type: line.toLowerCase().startsWith('incasare') ? 'income' : 'expense',
+                type: line.toLowerCase().startsWith('incasare') ? TYPE_INCOME : TYPE_EXPENSE,
                 details: [],
                 reference: null,
                 location: null

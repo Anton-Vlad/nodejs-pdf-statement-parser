@@ -1,3 +1,5 @@
+const TYPE_INCOME = "income";
+const TYPE_EXPENSE = "expense";
 const ROMANIAM_MONTHS = {
   ianuarie: 1,
   februarie: 2,
@@ -12,6 +14,12 @@ const ROMANIAM_MONTHS = {
   noiembrie: 11,
   decembrie: 12,
 };
+const REV_END_LOOP_KEYWORDS = ["Înapoiate din"];
+const REV_UNWANTED_STUFF_START_1 = "IBAN";
+const REV_UNWANTED_STUFF_START_2 = "Extras RON";
+const REV_UNWANTED_STUFF_END = "DatăDescriereSume retraseSume adăugateSold";
+const INCOME_KEYWORDS = ["De la:"];
+const REV_EXCHANGE_KEYWORDS = ["Schimbat în"];
 
 function revIdentifyBank(text) {
   const lines = text
@@ -20,7 +28,7 @@ function revIdentifyBank(text) {
     .filter(Boolean);
 
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("Revolut Bank UAB Vilnius")) {
+    if (lines[i].startsWith("Revolut Bank UAB")) {
       return "REV";
     }
   }
@@ -45,14 +53,14 @@ function revExtractCurrency(text) {
 
 function revExtractStatementDate(text) {
   const dateRangeRegex =
-    /de la (\d{1,2}) (\w+) (\d{4}) până la (\d{1,2}) (\w+) (\d{4})/i;
+    /Tranzacții din cont de la (\d{1,2}) (\w+) (\d{4}) până la (\d{1,2}) (\w+) (\d{4})/i;
   const lines = text
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
 
-  let startDate = null;
-  let endDate = null;
+  let startDate = [];
+  let endDate = [];
 
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].match(dateRangeRegex);
@@ -67,23 +75,76 @@ function revExtractStatementDate(text) {
     const format = (y, m, d) =>
       `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
-    startDate = format(y1, month1, d1);
-    endDate = format(y2, month2, d2);
-
-    break;
+    startDate.push(format(y1, month1, d1));
+    endDate.push(format(y2, month2, d2));
   }
 
   return {
-    startDate,
-    endDate,
+    startDate: startDate[0],
+    endDate: endDate[endDate.length - 1],
   };
 }
 
+function getTrailingAmountRegex(currency) {
+  // gets the regex for the trailing amount in a line, the last amount in the line
+  switch (currency) {
+    case "RON":
+      return new RegExp(
+        `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}$`
+      );
+    case "EUR":
+      return new RegExp(`€\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))$`);
+    case "USD":
+      return new RegExp(`\\$\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))$`);
+    default:
+      throw new Error(
+        `Unsupported currency: ${currency}. Supported currencies are RON, EUR, USD.`
+      );
+  }
+}
+
+// function get2AmountRegex(currency) {
+//   switch (currency) {
+//     case "RON":
+//       return new RegExp(
+//         `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
+//         "i"
+//       );
+//     case "EUR":
+//       return new RegExp(`€\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, "i");
+//     case "USD":
+//       return new RegExp(`\\$\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, "i");
+//     default:
+//       throw new Error(
+//         `Unsupported currency: ${currency}. Supported currencies are RON, EUR, USD.`
+//       );
+//   }
+// }
+
+function getAmountRegexByCurrency(currency, flags = "") {
+  switch (currency) {
+    case "RON":
+      return new RegExp(
+        `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
+        flags
+      );
+    case "EUR":
+      return new RegExp(`€\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, flags);
+    case "USD":
+      return new RegExp(
+        `\\$\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`,
+        flags
+      );
+    default:
+      // Fallback: match either symbol prefix or currency suffix
+      throw new Error(
+        `Unsupported currency: ${currency}. Supported currencies are RON, EUR, USD.`
+      );
+  }
+}
+
 function extractAmountStrings(line, currency = "RON") {
-  const regex = new RegExp(
-    `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
-    "g"
-  );
+  const regex = getAmountRegexByCurrency(currency, "gi");
   const matches = [];
   let match;
   while ((match = regex.exec(line)) !== null) {
@@ -114,33 +175,20 @@ function revExtractFinalBalance(text, currency = "RON") {
     .map((l) => l.trim())
     .filter(Boolean);
 
+  let foundMatches = [];
   for (let i = 0; i < lines.length; i++) {
     const matches = extractAmountStrings(lines[i], currency);
     if (matches.length === 4) {
-      return matches[3];
+      foundMatches.push(matches[3]);
     }
   }
 
+  if (foundMatches.length > 0) {
+    return foundMatches[foundMatches.length - 1];
+  }
   return null;
 }
 
-const REV_UNWANTED_STUFF_START_1 = "IBAN";
-const REV_UNWANTED_STUFF_START_2 = "Extras RON";
-const REV_UNWANTED_STUFF_END = "DatăDescriereSume retraseSume adăugateSold";
-
-function getAmountRegexByCurrency(currency) {
-  switch (currency) {
-    case 'RON':
-      return new RegExp(`(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`, 'gi');
-    case 'EUR':
-      return new RegExp(`€\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, 'gi');
-    case 'USD':
-      return new RegExp(`\\$\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, 'gi');
-    default:
-      // Fallback: match either symbol prefix or currency suffix
-      return new RegExp(`(?:€|\\$)?\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*(?:${currency})?`, 'gi');
-  }
-}
 function parseDateTransactionLine(line, currency = "RON") {
   const dateRegex =
     /^(\d{1,2}) (ian|feb|mar|apr|mai|iun|iul|aug|sep|oct|nov|dec)\. (\d{4})/i;
@@ -170,9 +218,7 @@ function parseDateTransactionLine(line, currency = "RON") {
   let rest = line.slice(rawDate.length).trim();
 
   // Remove trailing balance amount
-  const trailingAmountRegex = new RegExp(
-    `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}$`
-  );
+  const trailingAmountRegex = getTrailingAmountRegex(currency);
   rest = rest.replace(trailingAmountRegex, "").trim();
 
   const knownCounterpartyRegexes = [
@@ -194,10 +240,7 @@ function parseDateTransactionLine(line, currency = "RON") {
       const restAfterCounterparty = rest
         .slice(match.index + match[0].length)
         .trim();
-      const amountRegex = new RegExp(
-        `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
-        "i"
-      );
+      const amountRegex = getAmountRegexByCurrency(currency, "i");
       const amountMatch = restAfterCounterparty.match(amountRegex);
       if (amountMatch) {
         amount = amountMatch[1];
@@ -208,10 +251,7 @@ function parseDateTransactionLine(line, currency = "RON") {
   }
 
   // 2. Fallback: generic counterparty extraction
-  const amountRegex = new RegExp(
-    `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
-    "i"
-  );
+  const amountRegex = getTrailingAmountRegex(currency);
   const amountMatch = rest.match(amountRegex);
   if (amountMatch) {
     amount = amountMatch[1];
@@ -221,6 +261,26 @@ function parseDateTransactionLine(line, currency = "RON") {
   }
 
   return { date, counterparty, amount };
+}
+
+function checkDetailsForIncome(transaction) {
+  for (const line of transaction.details) {
+    for (const keyword of INCOME_KEYWORDS) {
+      if (line.includes(keyword)) {
+        return TYPE_INCOME;
+      }
+    }
+  }
+
+  for (const keyword of REV_EXCHANGE_KEYWORDS) {
+    if (transaction.location.startsWith(keyword)) {
+      if (transaction.location === keyword + " " + transaction.currency) {
+        return TYPE_INCOME; // Exchanges of same currency  as the account is considered income
+      }
+    }
+  }
+
+  return TYPE_EXPENSE;
 }
 
 function revStatementParse(text, currency = "RON") {
@@ -241,6 +301,7 @@ function revStatementParse(text, currency = "RON") {
     ) {
       skipLines = true;
       if (current) {
+        current.type = checkDetailsForIncome(current);
         transactions.push(current);
         current = null;
       }
@@ -256,10 +317,21 @@ function revStatementParse(text, currency = "RON") {
       continue;
     }
 
+    if (line.startsWith(REV_END_LOOP_KEYWORDS[0])) {
+      if (current) {
+        current.type = checkDetailsForIncome(current);
+        transactions.push(current);
+        current = null;
+      }
+      break;
+    }
+
     const headerLine = parseDateTransactionLine(lines[i], currency);
     if (headerLine) {
       if (current) {
+        current.type = checkDetailsForIncome(current);
         transactions.push(current);
+        current = null;
       }
 
       current = {
@@ -285,6 +357,12 @@ function revStatementParse(text, currency = "RON") {
 
       current.details.push(lines[i]);
     }
+  }
+
+  if (current) {
+    current.type = checkDetailsForIncome(current);
+    transactions.push(current);
+    current = null;
   }
 
   return transactions;
