@@ -103,24 +103,6 @@ function getTrailingAmountRegex(currency) {
   }
 }
 
-// function get2AmountRegex(currency) {
-//   switch (currency) {
-//     case "RON":
-//       return new RegExp(
-//         `(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))\\s*${currency}`,
-//         "i"
-//       );
-//     case "EUR":
-//       return new RegExp(`€\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, "i");
-//     case "USD":
-//       return new RegExp(`\\$\\s*(\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2}))`, "i");
-//     default:
-//       throw new Error(
-//         `Unsupported currency: ${currency}. Supported currencies are RON, EUR, USD.`
-//       );
-//   }
-// }
-
 function getAmountRegexByCurrency(currency, flags = "") {
   switch (currency) {
     case "RON":
