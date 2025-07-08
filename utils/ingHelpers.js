@@ -1,3 +1,17 @@
+const TYPE_INCOME = "income";
+const TYPE_EXPENSE = "expense";
+
+const ING_UNWANTED_STUFF_START = "ING Bank N.V. Amsterdam";
+const ING_UNWANTED_STUFF_START_ARRAY = ["Sold iniţial", "Sold initial"];
+const ING_UNWANTED_STUFF_END = "DebitCreditDetalii tranzactieData";
+const ING_COUNTERPARTY_KEYWORDS = ["Ordonator:", "Beneficiar:", "Terminal:"];
+const ING_REFERENCE_KEYWORDS = [
+  "Referinţă:",
+  "Referinta:",
+  "Numar autorizare:",
+  "Autorizare:",
+];
+
 function ingIdentifyBank(text) {
   if (text.includes("RB-PJS-40 024/18.02.99")) {
     return "ING";
@@ -6,26 +20,42 @@ function ingIdentifyBank(text) {
 }
 
 function ingExtractInitialBalance(text) {
-  const initialBalanceRegex = /Sold initial:\s*(\d{1,3}(?:\.\d{3})*,\d{2})/;
-  const foundMatches = text.match(initialBalanceRegex);
-  if (foundMatches) {
-    // // Replace dots with empty strings and commas with dots for correct float conversion
-    // const initialBalance = match1[1].replace(/\./g, "").replace(/,/g, ".");
-    // return parseFloat(initialBalance);
-    return foundMatches[1];
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (
+      lines[i].startsWith(ING_UNWANTED_STUFF_START_ARRAY[0]) ||
+      lines[i].startsWith(ING_UNWANTED_STUFF_START_ARRAY[1])
+    ) {
+      const match = lines[i].match(
+        /Sold (?:iniţial|initial)\s*(\d{1,3}(?:\.\d{3})*,\d{2})/
+      );
+      if (match) {
+        return match[1];
+      } else {
+        return lines[i+1];
+      }
+    }
   }
-  return null; // Return null if no match is found
+
+  return null;
 }
 
 function ingExtractFinalBalance(text) {
-  const finalBalanceRegex = /Sold final\s*(\d{1,3}(?:\.\d{3})*,\d{2})/;
-  const foundMatches = text.match(finalBalanceRegex);
-  if (foundMatches) {
-    // // Replace dots with empty strings and commas with dots for correct float conversion
-    // const finalBalance = match1[1].replace(/\./g, "").replace(/,/g, ".");
-    // return parseFloat(finalBalance);
-    return foundMatches[1];
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("Sold final")) {
+      return lines[i+1];
+    }
   }
+
   return null;
 }
 
@@ -66,14 +96,182 @@ function ingExtractStatementDates(text) {
   };
 }
 
-function ingStatementParse(data, currency = "RON") {
-  return {
-    bank: "ING",
-    currency: currency,
-    initialBalance: ingExtractInitialBalance(data),
-    finalBalance: ingExtractFinalBalance(data),
-    transactions: [],
-  };
+function parseTransactionHeaderLine(line) {
+  const romanianMonths = [
+    "ianuarie",
+    "februarie",
+    "martie",
+    "aprilie",
+    "mai",
+    "iunie",
+    "iulie",
+    "august",
+    "septembrie",
+    "octombrie",
+    "noiembrie",
+    "decembrie",
+  ];
+
+  // Match date pattern at the end of the string
+  const datePattern = new RegExp(
+    `(\\d{2})\\s+(${romanianMonths.join("|")})\\s+(\\d{4})$`,
+    "i"
+  );
+
+  const dateMatch = line.match(datePattern);
+
+  if (!dateMatch) {
+    return null; // 1. No valid date at end
+  }
+
+  // Extract date parts
+  const [fullDate, day, month, year] = dateMatch;
+  const date = `${day} ${month} ${year}`;
+
+  // Remove the date part from the original string
+  const textWithoutDate = line.replace(datePattern, "").trim();
+
+  // Match amount (format: number,decimal)
+  const amountPattern = /^(\d{1,3}(?:\.\d{3})*,\d{2})/;
+  const amountMatch = textWithoutDate.match(amountPattern);
+
+  if (amountMatch) {
+    const rawAmount = amountMatch[1];
+    const name = textWithoutDate.replace(rawAmount, "").trim();
+
+    return {
+      date,
+      amount: rawAmount,
+      name,
+      type: TYPE_EXPENSE,
+    };
+  } else {
+    return {
+      date,
+      amount: null,
+      name: textWithoutDate,
+      type: TYPE_INCOME,
+    };
+  }
+}
+
+function checkDetailsForAmount(transaction) {
+  if (transaction.amount) return transaction;
+
+  for (const line of transaction.details) {
+    const amountRegex = /^(\d{1,3}(?:\.\d{3})*,\d{2})$/;
+    if (amountRegex.test(line.trim())) {
+      transaction.details = transaction.details.filter((l) => l !== line);
+      transaction.amount = line.trim();
+      return transaction;
+    }
+  }
+  return transaction;
+}
+function checkDetailsForCounterparty(transaction) {
+  for (const line of transaction.details) {
+    for (const keyword of ING_COUNTERPARTY_KEYWORDS) {
+      if (line.startsWith(keyword)) {
+        transaction.details = transaction.details.filter((l) => l !== line);
+        transaction.location = line.replace(keyword, "").trim();
+        return transaction;
+      }
+    }
+  }
+  return transaction;
+}
+function checkDetailsForReference(transaction) {
+  for (const line of transaction.details) {
+    for (const keyword of ING_REFERENCE_KEYWORDS) {
+      if (line.includes(keyword)) {
+        transaction.details = transaction.details.filter((l) => l !== line);
+        const lineElements = line.split(":");
+        transaction.reference = lineElements
+          ? lineElements[lineElements.length - 1].trim()
+          : "";
+        return transaction;
+      }
+    }
+  }
+  return transaction;
+}
+
+function ingStatementParse(text, currency = "RON") {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const transactions = [];
+  let current = null;
+  let skipLines = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+
+    if (
+      line.startsWith(ING_UNWANTED_STUFF_START_ARRAY[0]) ||
+      line.startsWith(ING_UNWANTED_STUFF_START_ARRAY[1]) ||
+      (lines[i + 2] && lines[i + 2].startsWith(ING_UNWANTED_STUFF_START))
+    ) {
+      skipLines = true;
+
+      if (current) {
+        current = checkDetailsForAmount(current);
+        current = checkDetailsForCounterparty(current);
+        current = checkDetailsForReference(current);
+        transactions.push(current);
+        current = null;
+      }
+      continue;
+    }
+
+    if (line.startsWith(ING_UNWANTED_STUFF_END)) {
+      skipLines = false;
+      continue;
+    }
+
+    if (skipLines) {
+      continue;
+    }
+
+    const headerLine = parseTransactionHeaderLine(line);
+    if (headerLine) {
+      if (current) {
+        current = checkDetailsForAmount(current);
+        current = checkDetailsForCounterparty(current);
+        current = checkDetailsForReference(current);
+        transactions.push(current);
+        current = null;
+      }
+
+      current = {
+        name: headerLine.name,
+        date: headerLine.date,
+        amount: headerLine.amount,
+        currency: currency,
+        type: headerLine.type,
+        details: [],
+        reference: null,
+        location: "",
+      };
+
+      continue;
+    }
+
+    if (!headerLine && current) {
+      current.details.push(lines[i]);
+    }
+  }
+
+  if (current) {
+    current = checkDetailsForAmount(current);
+    current = checkDetailsForCounterparty(current);
+    current = checkDetailsForReference(current);
+    transactions.push(current);
+    current = null;
+  }
+
+  return transactions;
 }
 
 module.exports = {
