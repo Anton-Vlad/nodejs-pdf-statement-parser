@@ -1,0 +1,80 @@
+[
+  {
+    "name": "H&M",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "H&M"
+        }
+    ]
+  },
+  {
+    "name": "PAINE LA LARISA SRL",
+    "patterns": [
+         {
+            "field": "location",
+            "value": "PAINE LA LARISA SRL"
+        }
+    ]
+  },
+  {
+    "name": "LIDL",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "LIDL"
+        },
+        {
+            "field": "location",
+            "value": "LIDL RO"
+        },
+        {
+            "field": "location",
+            "value": "LIDL BALGARIYA"
+        }
+    ]
+  },
+  {
+    "name": "Auchan",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "AUC 0013"
+        },
+        {
+            "field": "location",
+            "value": "AUCHAN"
+        },
+        {
+            "field": "location",
+            "value": "AUC C1"
+        }
+    ]
+  },
+  {
+    "name": "Revolut",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "Revolut\\*\\*\\d{4}"
+        }
+    ]
+  },
+  {
+    "name": "EMAG",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "EMAG.RO"
+        },
+        {
+            "field": "location",
+            "value": "PAYU\\*EMAG"
+        },
+        {
+            "field": "location",
+            "value": "EMAG FAST"
+        }
+    ]
+  }
+]

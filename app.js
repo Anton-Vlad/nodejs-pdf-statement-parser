@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs/promises");
-const pdf = require("pdf-parse");
 
 const { parseStatement, analyzeFolder } = require("./utils/statementHelpers");
 
