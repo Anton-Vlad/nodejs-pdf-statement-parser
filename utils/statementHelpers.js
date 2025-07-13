@@ -143,7 +143,7 @@ const parseStatement = async (filePath, fileName) => {
   let dataBuffer = await fs.readFile(filePath);
   const fileData = await pdf(dataBuffer);
 
-  await fs.writeFile(fileName + "_log.txt", fileData.text, "utf8");
+  await fs.writeFile("logs/"+fileName + "_log.txt", fileData.text, "utf8");
 
   const statementBank = getStatementBank(fileData.text);
   const statementIBAN = extractIban(fileData.text);

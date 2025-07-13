@@ -48,6 +48,10 @@
         {
             "field": "location",
             "value": "AUC C1"
+        },
+        {
+            "field": "location",
+            "value": "0013 Crangasi"
         }
     ]
   },
@@ -57,6 +61,86 @@
         {
             "field": "location",
             "value": "Revolut\\*\\*\\d{4}"
+        }
+    ]
+  },
+  {
+    "name": "Kaufland",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "KAUFLAND"
+        },
+        {
+            "field": "location",
+            "value": "KAUFLAND \\d{4}"
+        }
+    ]
+  },
+  {
+    "name": "FOODKIT",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "FOODKIT.RO"
+        }
+    ]
+  },
+  {
+    "name": "MEGAIMAGE",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "MEGAIMAGE"
+        }
+    ]
+  },
+  {
+    "name": "CARREFOUR",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "CARREFOUR"
+        }
+    ]
+  },
+  {
+    "name": "UBER",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "UBER"
+        }
+    ]
+  },
+  {
+    "name": "METROREX",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "METROREX"
+        }
+    ]
+  },
+  {
+    "name": "TPARK",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "TPARK.RO"
+        }
+    ]
+  },
+  {
+    "name": "Telekom",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "Telekom"
+        },
+        {
+            "field": "location",
+            "value": "TELEKOM"
         }
     ]
   },
@@ -74,6 +158,42 @@
         {
             "field": "location",
             "value": "EMAG FAST"
+        }
+    ]
+  },
+  {
+    "name": "OMV",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "OMV"
+        }
+    ]
+  },
+  {
+    "name": "MOL",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "MOL"
+        }
+    ]
+  },
+  {
+    "name": "ROMPETROL",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "ROMPETROL"
+        }
+    ]
+  },
+  {
+    "name": "DEDEMAN",
+    "patterns": [
+        {
+            "field": "location",
+            "value": "DEDEMAN"
         }
     ]
   }

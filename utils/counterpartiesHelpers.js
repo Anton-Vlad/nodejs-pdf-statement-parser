@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs/promises");
+const { parseLocaleNumber } = require("./numbersHelpers");
 
 function normalizeCounterparty(transaction, RULES) {
     for (const rule of RULES) {
@@ -36,12 +37,21 @@ async function parseCounterparties(filePath) {
       if (!output[counterparty]) {
         output[counterparty] = {
           count: 0,
+          total: 0,
           transactions: [],
         };
       }
 
       output[counterparty].count += 1;
 
+      const amount = parseLocaleNumber(transaction.amount);
+      console.log(`Counterparty: ${counterparty}, Amount: ${amount}`, transaction);
+
+      if (transaction.type === "expense") {
+        output[counterparty].total -= parseLocaleNumber(transaction.amount);
+      } else if (transaction.type === "income") {
+        output[counterparty].total += parseLocaleNumber(transaction.amount);
+      }
 
       if (counterparty === 'Unknown') {
         // output[counterparty].transactions.push(transaction);

@@ -12,6 +12,10 @@ const ING_REFERENCE_KEYWORDS = [
   "Autorizare:",
 ];
 
+
+// To-do: Make sure amounts are normalized to a consistent format
+// To-do: Make sure dates are parsed correctly and normalized
+
 function ingIdentifyBank(text) {
   if (text.includes("RB-PJS-40 024/18.02.99")) {
     return "ING";
