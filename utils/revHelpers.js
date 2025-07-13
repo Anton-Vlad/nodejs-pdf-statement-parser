@@ -1,25 +1,13 @@
+const { REV_BANK_ID, ROMANIAM_MONTHS } = require("./constants");
 const TYPE_INCOME = "income";
 const TYPE_EXPENSE = "expense";
-const ROMANIAM_MONTHS = {
-  ianuarie: 1,
-  februarie: 2,
-  martie: 3,
-  aprilie: 4,
-  mai: 5,
-  iunie: 6,
-  iulie: 7,
-  august: 8,
-  septembrie: 9,
-  octombrie: 10,
-  noiembrie: 11,
-  decembrie: 12,
-};
-const REV_END_LOOP_KEYWORDS = ["Înapoiate din"];
+
+const REV_END_LOOP_KEYWORDS = ["Înapoiate din", "Tranzacții din Buzunare"];
 const REV_UNWANTED_STUFF_START_1 = "IBAN";
 const REV_UNWANTED_STUFF_START_2 = "Extras RON";
 const REV_UNWANTED_STUFF_END = "DatăDescriereSume retraseSume adăugateSold";
 const INCOME_KEYWORDS = ["De la:"];
-const REV_EXCHANGE_KEYWORDS = ["Schimbat în"];
+const REV_EXCHANGE_KEYWORDS = ["Schimbat în", "To"];
 
 function revIdentifyBank(text) {
   const lines = text
@@ -29,7 +17,7 @@ function revIdentifyBank(text) {
 
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].startsWith("Revolut Bank UAB")) {
-      return "REV";
+      return REV_BANK_ID;
     }
   }
 
@@ -265,6 +253,34 @@ function checkDetailsForIncome(transaction) {
   return TYPE_EXPENSE;
 }
 
+function extractRevolutIban(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].toLowerCase() === "iban") {
+      // Check next 1-2 lines for IBAN match
+      for (let j = 1; j <= 2; j++) {
+        const possibleIban = lines[i + j];
+        if (isValidIban(possibleIban)) {
+          return possibleIban.toUpperCase().replace(/\s+/g, "");
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+// Helper to validate IBAN format
+function isValidIban(str) {
+  return /^[A-Z]{2}\d{2}[A-Z0-9]{12,30}$/.test(
+    str.replace(/\s+/g, "").toUpperCase()
+  );
+}
+
 function revStatementParse(text, currency = "RON") {
   const lines = text
     .split("\n")
@@ -357,4 +373,5 @@ module.exports = {
   revExtractInitialBalance,
   revExtractFinalBalance,
   revStatementParse,
+  extractRevolutIban,
 };

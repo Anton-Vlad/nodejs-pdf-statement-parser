@@ -1,3 +1,5 @@
+const { BT_BANK_ID } = require("./constants");
+
 const TYPE_INCOME = "income";
 const TYPE_EXPENSE = "expense";
 
@@ -7,7 +9,7 @@ function btIdentifyBank(text) {
     text.includes("J12/4155/1993 • R.B. - P.J.R-12-019") || 
     text.includes("Nr. Inreg. Registrul Comertului: J1993004155124")
   ) {
-    return "BT";
+    return BT_BANK_ID;
   }
 
   return null;

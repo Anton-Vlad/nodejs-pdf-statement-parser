@@ -1,3 +1,5 @@
+const { ING_BANK_ID } = require("./constants");
+
 const TYPE_INCOME = "income";
 const TYPE_EXPENSE = "expense";
 
@@ -18,7 +20,7 @@ const ING_REFERENCE_KEYWORDS = [
 
 function ingIdentifyBank(text) {
   if (text.includes("RB-PJS-40 024/18.02.99")) {
-    return "ING";
+    return ING_BANK_ID;
   }
   return null;
 }

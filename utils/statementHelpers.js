@@ -15,7 +15,7 @@ const {
   ingExtractInitialBalance,
   ingExtractFinalBalance,
   ingExtractCurrency,
-  ingExtractStatementDates
+  ingExtractStatementDates,
 } = require("./ingHelpers");
 const {
   revIdentifyBank,
@@ -23,29 +23,32 @@ const {
   revExtractStatementDates,
   revExtractInitialBalance,
   revExtractFinalBalance,
-  revStatementParse
+  revStatementParse,
+  extractRevolutIban,
 } = require("./revHelpers");
+
+const { REV_BANK_ID, BT_BANK_ID, ING_BANK_ID } = require("./constants");
 
 function getStatementBank(data) {
   if (ingIdentifyBank(data)) {
-    return "ING";
+    return ING_BANK_ID;
   }
   if (btIdentifyBank(data)) {
-    return "BT";
+    return BT_BANK_ID;
   }
   if (revIdentifyBank(data)) {
-    return "REV";
+    return REV_BANK_ID;
   }
   return null;
 }
 
 function extractStatementDates(text, bank) {
   switch (bank) {
-    case "ING":
+    case ING_BANK_ID:
       return ingExtractStatementDates(text);
-    case "BT":
+    case BT_BANK_ID:
       return btExtractStatementDates(text);
-    case "REV":
+    case REV_BANK_ID:
       return revExtractStatementDates(text);
     default:
       return "Unknown bank";
@@ -54,11 +57,11 @@ function extractStatementDates(text, bank) {
 
 function extractCurrency(text, bank) {
   switch (bank) {
-    case "ING":
+    case ING_BANK_ID:
       return ingExtractCurrency(text);
-    case "BT":
+    case BT_BANK_ID:
       return btExtractCurrency(text);
-    case "REV":
+    case REV_BANK_ID:
       return revExtractCurrency(text);
     default:
       return "Unknown bank";
@@ -68,11 +71,11 @@ function extractCurrency(text, bank) {
 
 function extractInitialBalance(text, bank, currency) {
   switch (bank) {
-    case "ING":
+    case ING_BANK_ID:
       return ingExtractInitialBalance(text);
-    case "BT":
+    case BT_BANK_ID:
       return btExtractInitialBalance(text);
-    case "REV":
+    case REV_BANK_ID:
       return revExtractInitialBalance(text, currency);
 
     default:
@@ -82,11 +85,11 @@ function extractInitialBalance(text, bank, currency) {
 
 function extractFinalBalance(text, bank, currency) {
   switch (bank) {
-    case "ING":
+    case ING_BANK_ID:
       return ingExtractFinalBalance(text);
-    case "BT":
+    case BT_BANK_ID:
       return btExtractFinalBalance(text);
-    case "REV":
+    case REV_BANK_ID:
       return revExtractFinalBalance(text, currency);
 
     default:
@@ -94,7 +97,11 @@ function extractFinalBalance(text, bank, currency) {
   }
 }
 
-function extractIban(text) {
+function extractIban(text, bank) {
+  if (bank === REV_BANK_ID) {
+    return extractRevolutIban(text);
+  }
+
   // Enhanced regular expression to match an IBAN, including those with longer alphanumeric sequences
   const ibanRegex = /[A-Z]{2}\d{2}[A-Z0-9]{12,30}/;
   const match = text.match(ibanRegex);
@@ -106,11 +113,11 @@ function extractIban(text) {
 
 function parseTransactions(data, bank, currency = "RON", numpages = 1) {
   switch (bank) {
-    case "ING":
+    case ING_BANK_ID:
       return ingStatementParse(data, currency);
-    case "BT":
+    case BT_BANK_ID:
       return btStatementParse(data, currency);
-    case "REV":
+    case REV_BANK_ID:
       return revStatementParse(data, currency);
 
     default:
@@ -143,10 +150,10 @@ const parseStatement = async (filePath, fileName) => {
   let dataBuffer = await fs.readFile(filePath);
   const fileData = await pdf(dataBuffer);
 
-  await fs.writeFile("logs/"+fileName + "_log.txt", fileData.text, "utf8");
+  await fs.writeFile("logs/" + fileName + "_log.txt", fileData.text, "utf8");
 
   const statementBank = getStatementBank(fileData.text);
-  const statementIBAN = extractIban(fileData.text);
+  const statementIBAN = extractIban(fileData.text, statementBank);
   const statementDates = extractStatementDates(fileData.text, statementBank);
   const statementCurrency = extractCurrency(fileData.text, statementBank);
   const statementInitialBalance = extractInitialBalance(
