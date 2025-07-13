@@ -1,7 +1,5 @@
-const { ING_BANK_ID } = require("./constants");
-
-const TYPE_INCOME = "income";
-const TYPE_EXPENSE = "expense";
+const { ING_BANK_ID, ROMANIAM_MONTHS, TYPE_INCOME, TYPE_EXPENSE } = require("./constants");
+const { parseLocaleNumber } = require("./numbersHelpers");
 
 const ING_UNWANTED_STUFF_START = "ING Bank N.V. Amsterdam";
 const ING_UNWANTED_STUFF_START_ARRAY = ["Sold iniţial", "Sold initial"];
@@ -13,10 +11,6 @@ const ING_REFERENCE_KEYWORDS = [
   "Numar autorizare:",
   "Autorizare:",
 ];
-
-
-// To-do: Make sure amounts are normalized to a consistent format
-// To-do: Make sure dates are parsed correctly and normalized
 
 function ingIdentifyBank(text) {
   if (text.includes("RB-PJS-40 024/18.02.99")) {
@@ -40,9 +34,9 @@ function ingExtractInitialBalance(text) {
         /Sold (?:iniţial|initial)\s*(\d{1,3}(?:\.\d{3})*,\d{2})/
       );
       if (match) {
-        return match[1];
+        return parseLocaleNumber(match[1]).toFixed(2);
       } else {
-        return lines[i+1];
+        return parseLocaleNumber(lines[i+1]).toFixed(2);
       }
     }
   }
@@ -58,7 +52,7 @@ function ingExtractFinalBalance(text) {
 
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].startsWith("Sold final")) {
-      return lines[i+1];
+      return parseLocaleNumber(lines[i+1]).toFixed(2);
     }
   }
 
@@ -103,20 +97,7 @@ function ingExtractStatementDates(text) {
 }
 
 function parseTransactionHeaderLine(line) {
-  const romanianMonths = [
-    "ianuarie",
-    "februarie",
-    "martie",
-    "aprilie",
-    "mai",
-    "iunie",
-    "iulie",
-    "august",
-    "septembrie",
-    "octombrie",
-    "noiembrie",
-    "decembrie",
-  ];
+  const romanianMonths = Object.keys(ROMANIAM_MONTHS);
 
   // Match date pattern at the end of the string
   const datePattern = new RegExp(
@@ -132,7 +113,8 @@ function parseTransactionHeaderLine(line) {
 
   // Extract date parts
   const [fullDate, day, month, year] = dateMatch;
-  const date = `${day} ${month} ${year}`;
+  const monthNumber = ROMANIAM_MONTHS[month.toLowerCase()];
+  const date = `${year}-${String(monthNumber).padStart(2, "0")}-${day}`;
 
   // Remove the date part from the original string
   const textWithoutDate = line.replace(datePattern, "").trim();

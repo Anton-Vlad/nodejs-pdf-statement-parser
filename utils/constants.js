@@ -2,6 +2,9 @@ const REV_BANK_ID = "REV";
 const BT_BANK_ID = "BT";
 const ING_BANK_ID = "ING";
 
+const TYPE_INCOME = "income";
+const TYPE_EXPENSE = "expense";
+
 const ROMANIAM_MONTHS = {
   ianuarie: 1,
   februarie: 2,
@@ -21,5 +24,7 @@ module.exports = {
   REV_BANK_ID,
   BT_BANK_ID,
   ING_BANK_ID,
-  ROMANIAM_MONTHS
+  ROMANIAM_MONTHS,
+  TYPE_INCOME,
+  TYPE_EXPENSE,
 };

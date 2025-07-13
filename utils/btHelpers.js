@@ -1,7 +1,5 @@
-const { BT_BANK_ID } = require("./constants");
-
-const TYPE_INCOME = "income";
-const TYPE_EXPENSE = "expense";
+const { BT_BANK_ID, TYPE_INCOME, TYPE_EXPENSE } = require("./constants");
+const { parseLocaleNumber } = require("./numbersHelpers");
 
 function btIdentifyBank(text) {
   if (
@@ -23,7 +21,7 @@ function btExtractInitialBalance(text) {
     // // Replace commas used as thousand separators (if any) and convert the string to a float number
     // const balance = parseFloat(match2[1].replace(/,/g, ""));
     // return balance;
-    return foundMatches[1];
+    return parseLocaleNumber(foundMatches[1]).toFixed(2);
   }
   return null; // Return null if no match is found or if parsing fails
 }
@@ -38,7 +36,7 @@ function btExtractFinalBalance(text) {
     // const normalizedAmount = match2[1].replace(/,/g, "").replace(/\./g, "");
     // const balance = parseFloat(normalizedAmount) / 100; // Convert string to float and adjust for cents
     // return balance;
-    return foundMatches[1];
+    return parseLocaleNumber(foundMatches[1]).toFixed(2);
   }
   return null; // Return null if no match is found
 }

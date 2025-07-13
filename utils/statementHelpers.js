@@ -1,6 +1,8 @@
 const path = require("path");
 const fs = require("fs/promises");
 const pdf = require("pdf-parse");
+const { randomUUID } = require('crypto');
+const { parseLocaleNumber } = require("./numbersHelpers");
 const {
   btStatementParse,
   btExtractStatementDates,
@@ -28,6 +30,37 @@ const {
 } = require("./revHelpers");
 
 const { REV_BANK_ID, BT_BANK_ID, ING_BANK_ID } = require("./constants");
+
+function formatTrasactionObject(transaction) {
+  return {
+    proprietaryBankTransactionCode: transaction.name || "Unknown",
+    bookingDate: transaction.date || "Unknown",
+    transactionAmount: formatTransactionAmount({...transaction}),
+    details: transaction.details || [],
+    transactionId: transaction.reference || null,
+    counterparty: transaction.location || "",
+    internalTransactionId: randomUUID(),
+  };
+}
+
+function formatTransactionAmount(transaction) {
+  if (!transaction || !transaction.type || !transaction.amount) {
+    console.warn("Invalid transaction data:", transaction);
+    return {
+      amount: 0,
+      currency: transaction.currency || "RON",
+    };
+  }
+
+  let amount = parseLocaleNumber(transaction.amount);
+  if (transaction.type === "expense") {
+    amount = -1 * amount;
+  }
+  return {
+    amount: amount.toFixed(2),
+    currency: transaction.currency || "RON",
+  };
+}
 
 function getStatementBank(data) {
   if (ingIdentifyBank(data)) {
@@ -167,12 +200,14 @@ const parseStatement = async (filePath, fileName) => {
     statementCurrency
   );
 
-  const transactions = parseTransactions(
+  let transactions = parseTransactions(
     fileData.text,
     statementBank,
     statementCurrency,
     fileData.numpages
   );
+
+  transactions = transactions.map((transaction) => formatTrasactionObject(transaction));
 
   console.log(
     JSON.stringify({

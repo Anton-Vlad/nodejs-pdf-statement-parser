@@ -1,6 +1,5 @@
-const { REV_BANK_ID, ROMANIAM_MONTHS } = require("./constants");
-const TYPE_INCOME = "income";
-const TYPE_EXPENSE = "expense";
+const { REV_BANK_ID, ROMANIAM_MONTHS, TYPE_INCOME, TYPE_EXPENSE } = require("./constants");
+const { parseLocaleNumber } = require("./numbersHelpers");
 
 const REV_END_LOOP_KEYWORDS = ["Înapoiate din", "Tranzacții din Buzunare"];
 const REV_UNWANTED_STUFF_START_1 = "IBAN";
@@ -132,7 +131,7 @@ function revExtractInitialBalance(text, currency = "RON") {
   for (let i = 0; i < lines.length; i++) {
     const matches = extractAmountStrings(lines[i], currency);
     if (matches.length === 4) {
-      return matches[0];
+      return parseLocaleNumber(matches[0]).toFixed(2);
     }
   }
 
@@ -154,7 +153,7 @@ function revExtractFinalBalance(text, currency = "RON") {
   }
 
   if (foundMatches.length > 0) {
-    return foundMatches[foundMatches.length - 1];
+    return parseLocaleNumber(foundMatches[foundMatches.length - 1]).toFixed(2);
   }
   return null;
 }
