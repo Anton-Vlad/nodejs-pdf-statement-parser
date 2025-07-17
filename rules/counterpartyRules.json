@@ -10,6 +10,7 @@
   },
   {
     "name": "H&M",
+    "tags": ["Shopping", "Clothing", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -19,6 +20,7 @@
   },
   {
     "name": "PAINE LA LARISA SRL",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -28,6 +30,7 @@
   },
   {
     "name": "LIDL",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -45,6 +48,7 @@
   },
   {
     "name": "PENNY",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -54,6 +58,7 @@
   },
   {
     "name": "GODAC",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -63,6 +68,7 @@
   },
   {
     "name": "AUCHAN",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -84,6 +90,7 @@
   },
   {
     "name": "Revolut",
+    "tags": ["Banking", "Transfer"],
     "patterns": [
       {
         "field": "location",
@@ -93,6 +100,7 @@
   },
   {
     "name": "Kaufland",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -106,6 +114,7 @@
   },
   {
     "name": "FOODKIT",
+    "tags": ["Food", "Lunch"],
     "patterns": [
       {
         "field": "location",
@@ -115,6 +124,7 @@
   },
   {
     "name": "MEGAIMAGE",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -124,6 +134,7 @@
   },
   {
     "name": "CARREFOUR",
+    "tags": ["Food", "Supermarket"],
     "patterns": [
       {
         "field": "location",
@@ -133,6 +144,7 @@
   },
   {
     "name": "UBER",
+    "tags": ["Transport", "Taxi"],
     "patterns": [
       {
         "field": "location",
@@ -142,6 +154,7 @@
   },
   {
     "name": "METROREX",
+    "tags": ["Transport", "Metro", "Commuting"],
     "patterns": [
       {
         "field": "location",
@@ -151,6 +164,7 @@
   },
   {
     "name": "TPARK",
+    "tags": ["Transport", "Car", "Parking"],
     "patterns": [
       {
         "field": "location",
@@ -160,6 +174,7 @@
   },
   {
     "name": "Telekom",
+    "tags": ["PredictableOperation", "Household", "Subscription"],
     "patterns": [
       {
         "field": "location",
@@ -173,6 +188,7 @@
   },
   {
     "name": "DIGI",
+    "tags": ["PredictableOperation", "Household", "Subscription"],
     "patterns": [
       {
         "field": "location",
@@ -186,6 +202,7 @@
   },
   {
     "name": "EMAG",
+    "tags": ["Shopping"],
     "patterns": [
       {
         "field": "location",
@@ -203,6 +220,7 @@
   },
   {
     "name": "OMV",
+    "tags": ["Transport", "Car", "Fuel"],
     "patterns": [
       {
         "field": "location",
@@ -212,6 +230,7 @@
   },
   {
     "name": "MOL",
+    "tags": ["Transport", "Car", "Fuel"],
     "patterns": [
       {
         "field": "location",
@@ -221,6 +240,7 @@
   },
   {
     "name": "SOCAR",
+    "tags": ["Transport", "Car", "Fuel"],
     "patterns": [
       {
         "field": "location",
@@ -230,6 +250,7 @@
   },
   {
     "name": "ROMPETROL",
+    "tags": ["Transport", "Car", "Fuel"],
     "patterns": [
       {
         "field": "location",
@@ -239,6 +260,7 @@
   },
   {
     "name": "DEDEMAN",
+    "tags": ["UnpredictableWish", "Household"],
     "patterns": [
       {
         "field": "location",
@@ -248,6 +270,7 @@
   },
   {
     "name": "BRICOSTORE",
+    "tags": ["UnpredictableWish", "Household"],
     "patterns": [
       {
         "field": "location",
@@ -256,7 +279,28 @@
     ]
   },
   {
+    "name": "JYSK",
+    "tags": ["UnpredictableWish", "Household"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "JYSK"
+      }
+    ]
+  },
+  {
+    "name": "IKEA",
+    "tags": ["UnpredictableWish", "Household"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "IKEA PALLADY CASA"
+      }
+    ]
+  },
+  {
     "name": "HEYBLU",
+    "tags": ["MainIncome", "Household"],
     "patterns": [
       {
         "field": "details",
@@ -266,6 +310,7 @@
   },
   {
     "name": "AVV CREATION",
+    "tags": ["MainIncome", "Household"],
     "patterns": [
       {
         "field": "location",
@@ -275,6 +320,7 @@
   },
   {
     "name": "PIZZA CAPU CAMPULUI",
+    "tags": ["Food", "Restaurant"],
     "patterns": [
       {
         "field": "location",
@@ -283,7 +329,28 @@
     ]
   },
   {
+    "name": "IKEA RESTAURANT",
+    "tags": ["Food", "Restaurant"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "IKEA PALLADY RESTAURANT"
+      }
+    ]
+  },
+  {
+    "name": "Sera Eden",
+    "tags": ["Food", "Restaurant"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "Sera Eden RO"
+      }
+    ]
+  },
+  {
     "name": "DOUGLAS",
+    "tags": ["Shopping", "Beauty", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -293,6 +360,7 @@
   },
   {
     "name": "APPLE",
+    "tags": ["Subscription", "PredictableOperation"],
     "patterns": [
       {
         "field": "location",
@@ -302,24 +370,43 @@
   },
   {
     "name": "TRANSFER IN FAMILIE",
+    "tags": ["Family", "Transfer"],
     "patterns": [
       {
         "field": "location",
         "value": "andrei frate"
+      },
+      {
+        "field": "location",
+        "value": "Anton Andrei"
+      },
+      {
+        "field": "location",
+        "value": "Vlad Anton"
+      },
+      {
+        "field": "location",
+        "value": "Vlad Viorel Anton"
       }
     ]
   },
   {
     "name": "NETFLIX",
+    "tags": ["Subscription", "Entertainment", "PredictableOperation"],
     "patterns": [
       {
         "field": "location",
         "value": "NETFLIX INTERNATIONAL"
+      },
+      {
+        "field": "location",
+        "value": "Netflix.com NL"
       }
     ]
   },
   {
     "name": "DS DAMAT",
+    "tags": ["Shopping", "Clothing", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -328,7 +415,28 @@
     ]
   },
   {
+    "name": "Restaurant Aria TNB",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "Restaurant Aria TNB"
+      }
+    ]
+  },
+  {
+    "name": "EVIA OCEANIC BEACH",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],    
+    "patterns": [
+      {
+        "field": "location",
+        "value": "EVIA OCEANIC BEACH SRL"
+      }
+    ]
+  },
+  {
     "name": "UDEMY",
+    "tags": ["Education", "OnlineCourses", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -338,6 +446,7 @@
   },
   {
     "name": "BROWNERIE",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -347,6 +456,7 @@
   },
   {
     "name": "PPC ENERGIE",
+    "tags": ["Household", "Utilities", "PredictableOperation"],
     "patterns": [
       {
         "field": "location",
@@ -356,6 +466,7 @@
   },
   {
     "name": "CARTURESTI",
+    "tags": ["Shopping", "Books", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -365,6 +476,7 @@
   },
   {
     "name": "STB",
+    "tags": ["Transport", "PublicTransport", "Commuting"],
     "patterns": [
       {
         "field": "location",
@@ -374,6 +486,7 @@
   },
   {
     "name": "AEROPORT OTOPENI",
+    "tags": ["Transport", "Airport", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
@@ -383,6 +496,7 @@
   },
   {
     "name": "YouTubePremium",
+    "tags": ["Subscription", "Entertainment", "PredictableOperation"],
     "patterns": [
       {
         "field": "location",
@@ -392,10 +506,115 @@
   },
   {
     "name": "ZEINA KEBAB",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
     "patterns": [
       {
         "field": "location",
         "value": "ZEINA GIULESTI"
+      }
+    ]
+  },
+  {
+    "name": "VIVO STREET FOOD",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "VIVO STREET FOOD"
+      }
+    ]
+  },
+  {
+    "name": "CEAIURI IMPEX",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "CEAIURI IMPEX SRL"
+      }
+    ]
+  },
+  {
+    "name": "ROZ CAFE",
+    "tags": ["Food", "Restaurant", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "ROZ CAFE BISTRO"
+      }
+    ]
+  },
+  {
+    "name": "COMICS",
+    "tags": ["Entertainment", "Restaurant", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "Comics RO"
+      }
+    ]
+  },
+  {
+    "name": "IABILET",
+    "tags": ["Entertainment", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "iabilet.ro RO"
+      }
+    ]
+  },
+  {
+    "name": "certsign",
+    "tags": ["Subscription", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "certsign RO"
+      }
+    ]
+  },
+  {
+    "name": "IMPLANT EXPERT",
+    "tags": ["Health", "Dental", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "IMPLANT EXPERT SA"
+      }
+    ]
+  },
+  {
+    "name": "CATENA",
+    "tags": ["Health", "Pharma", "UnpredictableWish"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "CATENA FARMACIE"
+      }
+    ]
+  },
+  {
+    "name": "REGINA MARIA",
+    "tags": ["Health", "Subscription", "PredictableOperation"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "REGINA MARIA RO"
+      }
+    ]
+  },
+  {
+    "name": "ROMANIAN STATE",
+    "tags": ["Household", "Taxes", "PredictableOperation"],
+    "patterns": [
+      {
+        "field": "location",
+        "value": "WWW.GHISEUL.RO"
+      },
+      {
+        "field": "location",
+        "value": "ghiseul.ro RO"
       }
     ]
   }

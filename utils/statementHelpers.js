@@ -165,6 +165,39 @@ function parseTransactions(data, bank, currency = "RON", numpages = 1) {
   }
 }
 
+function calculateTagsStats(transactions, RULES) {
+  const tagsStats = {};
+
+  for (const transaction of transactions) {
+    if (!transaction.counterparty || !transaction.counterparty.id) {
+      continue; // Skip transactions without a counterparty
+    }
+
+    const counterpartyId = transaction.counterparty.id;
+    const rule = RULES.find(rule => rule.name === counterpartyId);
+
+    if (rule && rule.tags) {
+      for (const tag of rule.tags) {
+        if (!tagsStats[tag]) {
+          tagsStats[tag] = { name: tag, count: 0, amount: 0, ids: [] };
+        }
+        if (!tagsStats[tag].ids.includes(transaction.internalTransactionId)) {
+          tagsStats[tag].ids.push(transaction.internalTransactionId);
+        }
+        tagsStats[tag].count += 1;
+        tagsStats[tag].amount += parseLocaleNumber(transaction.transactionAmount.amount);
+      }
+    }
+  }
+
+  return Object.entries(tagsStats).map(([name, data]) => ({
+    name,
+    count: data.count,
+    total: data.amount.toFixed(2),
+    ids: data.ids,
+  }));
+}
+
 function calculateCounterpartiesStats(transactions) {
   const counterpartyDict = {};
   const unknownCounterparty = {
@@ -283,9 +316,18 @@ const parseStatement = async (filePath, fileName) => {
   );
 
   const stats = {
-    income: transactions.filter(transaction => transaction.transactionAmount.amount > 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
-    expense: transactions.filter(transaction => transaction.transactionAmount.amount < 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
-    counterparties: calculateCounterpartiesStats(transactions)
+    income: {
+      name: "Income",
+      count: transactions.filter(transaction => transaction.transactionAmount.amount > 0).length,
+      total: transactions.filter(transaction => transaction.transactionAmount.amount > 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
+    },
+    expense: {
+      name: "Expense",
+      count: transactions.filter(transaction => transaction.transactionAmount.amount < 0).length,
+      total: transactions.filter(transaction => transaction.transactionAmount.amount < 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
+    },
+    counterparties: calculateCounterpartiesStats(transactions),
+    tags: calculateTagsStats(transactions, RULES),
   };
 
   let out = {};
