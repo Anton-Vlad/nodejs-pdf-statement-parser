@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs/promises");
 const pdf = require("pdf-parse");
-const { randomUUID } = require('crypto');
+const { randomUUID } = require("crypto");
 const { parseLocaleNumber } = require("./numbersHelpers");
 const {
   btStatementParse,
@@ -30,15 +30,21 @@ const {
 } = require("./revHelpers");
 
 const { REV_BANK_ID, BT_BANK_ID, ING_BANK_ID } = require("./constants");
+const { normalizeCounterparty } = require("./counterpartiesHelpers");
 
-function formatTrasactionObject(transaction) {
+function formatTrasactionObject(transaction, RULES) {
+  const counterparty = normalizeCounterparty(transaction, RULES);
+
   return {
     proprietaryBankTransactionCode: transaction.name || "Unknown",
     bookingDate: transaction.date || "Unknown",
-    transactionAmount: formatTransactionAmount({...transaction}),
+    transactionAmount: formatTransactionAmount({ ...transaction }),
     details: transaction.details || [],
     transactionId: transaction.reference || null,
-    counterparty: transaction.location || "",
+    counterparty: {
+      id: counterparty,
+      description: counterparty === "Unknown" ? transaction.location || "" : "",
+    },
     internalTransactionId: randomUUID(),
   };
 }
@@ -159,6 +165,56 @@ function parseTransactions(data, bank, currency = "RON", numpages = 1) {
   }
 }
 
+function calculateCounterpartiesStats(transactions) {
+  const counterpartyDict = {};
+  const unknownCounterparty = {
+    name: "Unknown",
+    count: 0,
+    amount: 0,
+  };
+
+  for (const transaction of transactions) {
+    if (!transaction.counterparty || !transaction.counterparty.id) {
+      unknownCounterparty.count += 1;
+      unknownCounterparty.amount += parseLocaleNumber(transaction.transactionAmount.amount);
+      continue;
+    }
+
+    const counterpartyId = transaction.counterparty.id;
+    if (!counterpartyDict[counterpartyId]) {
+      counterpartyDict[counterpartyId] = {
+        name: counterpartyId,
+        count: 0,
+        amount: 0,
+      };
+    }
+    counterpartyDict[counterpartyId].count += 1;
+    counterpartyDict[counterpartyId].amount += parseLocaleNumber(transaction.transactionAmount.amount);
+  }
+
+  let out = [...Object.values(counterpartyDict)]
+  .map(counterparty => ({
+    name: counterparty.name,
+    count: counterparty.count,
+    total: counterparty.amount.toFixed(2),
+  }))
+  .sort((a, b) => {
+    return b.count - a.count;
+  });
+
+  return out;
+}
+
+function validateTransactionsCheckSum(finalBalance, initialBalance, transactions) {
+  const balanceDiff = (finalBalance || 0) - (initialBalance || 0);
+  let transactionsSum = 0;
+  for (const transaction of transactions) {
+    transactionsSum += parseLocaleNumber(transaction.transactionAmount.amount);
+  }
+
+  return Math.abs(balanceDiff - transactionsSum) < 0.001; // Allowing a small tolerance for floating point errors
+}
+
 function mergeMetaArray(metaArray) {
   if (!Array.isArray(metaArray) || metaArray.length === 0) return null;
 
@@ -182,6 +238,9 @@ function mergeMetaArray(metaArray) {
 const parseStatement = async (filePath, fileName) => {
   let dataBuffer = await fs.readFile(filePath);
   const fileData = await pdf(dataBuffer);
+  const RULES = JSON.parse(
+    await fs.readFile(path.join(__dirname, "../rules/counterpartyRules.json"))
+  );
 
   await fs.writeFile("logs/" + fileName + "_log.txt", fileData.text, "utf8");
 
@@ -207,7 +266,9 @@ const parseStatement = async (filePath, fileName) => {
     fileData.numpages
   );
 
-  transactions = transactions.map((transaction) => formatTrasactionObject(transaction));
+  transactions = transactions.map((transaction) =>
+    formatTrasactionObject(transaction, RULES)
+  );
 
   console.log(
     JSON.stringify({
@@ -221,6 +282,12 @@ const parseStatement = async (filePath, fileName) => {
     })
   );
 
+  const stats = {
+    income: transactions.filter(transaction => transaction.transactionAmount.amount > 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
+    expense: transactions.filter(transaction => transaction.transactionAmount.amount < 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
+    counterparties: calculateCounterpartiesStats(transactions)
+  };
+
   let out = {};
   out[statementIBAN] = {
     meta: {
@@ -229,7 +296,9 @@ const parseStatement = async (filePath, fileName) => {
       dates: statementDates,
       initialBalance: statementInitialBalance,
       finalBalance: statementFinalBalance,
+      validCheckSumBalance: validateTransactionsCheckSum(statementFinalBalance, statementInitialBalance, transactions)
     },
+    stats: stats,
     transactions: transactions,
   };
 

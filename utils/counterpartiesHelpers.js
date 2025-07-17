@@ -7,7 +7,11 @@ function normalizeCounterparty(transaction, RULES) {
         for (let i = 0; i < rule.patterns.length; i++) {
             const pattern = rule.patterns[i];
             const regex = new RegExp(pattern.value, "i");
-            if (regex.test(transaction[pattern.field])) {
+            let fieldValue = transaction[pattern.field];
+            if (Array.isArray(fieldValue)) {
+                fieldValue = fieldValue.join(" ");
+            }
+            if (regex.test(fieldValue)) {
                 return rule.name;
             }
         }
@@ -65,4 +69,5 @@ async function parseCounterparties(filePath) {
 
 module.exports = {
   parseCounterparties,
+  normalizeCounterparty,
 };

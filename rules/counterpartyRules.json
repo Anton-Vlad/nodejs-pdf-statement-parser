@@ -1,200 +1,402 @@
 [
   {
+    "name": "Retragere cash",
+    "patterns": [
+      {
+        "field": "name",
+        "value": "Retragere numerar"
+      }
+    ]
+  },
+  {
     "name": "H&M",
     "patterns": [
-        {
-            "field": "location",
-            "value": "H&M"
-        }
+      {
+        "field": "location",
+        "value": "H&M"
+      }
     ]
   },
   {
     "name": "PAINE LA LARISA SRL",
     "patterns": [
-         {
-            "field": "location",
-            "value": "PAINE LA LARISA SRL"
-        }
+      {
+        "field": "location",
+        "value": "PAINE LA LARISA SRL"
+      }
     ]
   },
   {
     "name": "LIDL",
     "patterns": [
-        {
-            "field": "location",
-            "value": "LIDL"
-        },
-        {
-            "field": "location",
-            "value": "LIDL RO"
-        },
-        {
-            "field": "location",
-            "value": "LIDL BALGARIYA"
-        }
+      {
+        "field": "location",
+        "value": "LIDL"
+      },
+      {
+        "field": "location",
+        "value": "LIDL RO"
+      },
+      {
+        "field": "location",
+        "value": "LIDL BALGARIYA"
+      }
     ]
   },
   {
-    "name": "Auchan",
+    "name": "PENNY",
     "patterns": [
-        {
-            "field": "location",
-            "value": "AUC 0013"
-        },
-        {
-            "field": "location",
-            "value": "AUCHAN"
-        },
-        {
-            "field": "location",
-            "value": "AUC C1"
-        },
-        {
-            "field": "location",
-            "value": "0013 Crangasi"
-        }
+      {
+        "field": "location",
+        "value": "PENNY"
+      }
+    ]
+  },
+  {
+    "name": "GODAC",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "GODAC GIULESTI"
+      }
+    ]
+  },
+  {
+    "name": "AUCHAN",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "AUC 0013"
+      },
+      {
+        "field": "location",
+        "value": "AUCHAN"
+      },
+      {
+        "field": "location",
+        "value": "AUC C1"
+      },
+      {
+        "field": "location",
+        "value": "0013 Crangasi"
+      }
     ]
   },
   {
     "name": "Revolut",
     "patterns": [
-        {
-            "field": "location",
-            "value": "Revolut\\*\\*\\d{4}"
-        }
+      {
+        "field": "location",
+        "value": "Revolut\\*\\*\\d{4}"
+      }
     ]
   },
   {
     "name": "Kaufland",
     "patterns": [
-        {
-            "field": "location",
-            "value": "KAUFLAND"
-        },
-        {
-            "field": "location",
-            "value": "KAUFLAND \\d{4}"
-        }
+      {
+        "field": "location",
+        "value": "KAUFLAND"
+      },
+      {
+        "field": "location",
+        "value": "KAUFLAND \\d{4}"
+      }
     ]
   },
   {
     "name": "FOODKIT",
     "patterns": [
-        {
-            "field": "location",
-            "value": "FOODKIT.RO"
-        }
+      {
+        "field": "location",
+        "value": "FOODKIT.RO"
+      }
     ]
   },
   {
     "name": "MEGAIMAGE",
     "patterns": [
-        {
-            "field": "location",
-            "value": "MEGAIMAGE"
-        }
+      {
+        "field": "location",
+        "value": "MEGAIMAGE"
+      }
     ]
   },
   {
     "name": "CARREFOUR",
     "patterns": [
-        {
-            "field": "location",
-            "value": "CARREFOUR"
-        }
+      {
+        "field": "location",
+        "value": "CARREFOUR"
+      }
     ]
   },
   {
     "name": "UBER",
     "patterns": [
-        {
-            "field": "location",
-            "value": "UBER"
-        }
+      {
+        "field": "location",
+        "value": "UBER"
+      }
     ]
   },
   {
     "name": "METROREX",
     "patterns": [
-        {
-            "field": "location",
-            "value": "METROREX"
-        }
+      {
+        "field": "location",
+        "value": "METROREX"
+      }
     ]
   },
   {
     "name": "TPARK",
     "patterns": [
-        {
-            "field": "location",
-            "value": "TPARK.RO"
-        }
+      {
+        "field": "location",
+        "value": "TPARK.RO"
+      }
     ]
   },
   {
     "name": "Telekom",
     "patterns": [
-        {
-            "field": "location",
-            "value": "Telekom"
-        },
-        {
-            "field": "location",
-            "value": "TELEKOM"
-        }
+      {
+        "field": "location",
+        "value": "Telekom"
+      },
+      {
+        "field": "location",
+        "value": "TELEKOM"
+      }
+    ]
+  },
+  {
+    "name": "DIGI",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "DIGI ROMANIA"
+      },
+      {
+        "field": "location",
+        "value": "Digi"
+      }
     ]
   },
   {
     "name": "EMAG",
     "patterns": [
-        {
-            "field": "location",
-            "value": "EMAG.RO"
-        },
-        {
-            "field": "location",
-            "value": "PAYU\\*EMAG"
-        },
-        {
-            "field": "location",
-            "value": "EMAG FAST"
-        }
+      {
+        "field": "location",
+        "value": "EMAG.RO"
+      },
+      {
+        "field": "location",
+        "value": "PAYU\\*EMAG"
+      },
+      {
+        "field": "location",
+        "value": "EMAG FAST"
+      }
     ]
   },
   {
     "name": "OMV",
     "patterns": [
-        {
-            "field": "location",
-            "value": "OMV"
-        }
+      {
+        "field": "location",
+        "value": "OMV"
+      }
     ]
   },
   {
     "name": "MOL",
     "patterns": [
-        {
-            "field": "location",
-            "value": "MOL"
-        }
+      {
+        "field": "location",
+        "value": "MOL"
+      }
+    ]
+  },
+  {
+    "name": "SOCAR",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "SOCAR PETROLEUM"
+      }
     ]
   },
   {
     "name": "ROMPETROL",
     "patterns": [
-        {
-            "field": "location",
-            "value": "ROMPETROL"
-        }
+      {
+        "field": "location",
+        "value": "ROMPETROL"
+      }
     ]
   },
   {
     "name": "DEDEMAN",
     "patterns": [
-        {
-            "field": "location",
-            "value": "DEDEMAN"
-        }
+      {
+        "field": "location",
+        "value": "DEDEMAN"
+      }
+    ]
+  },
+  {
+    "name": "BRICOSTORE",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "BRICOSTORE"
+      }
+    ]
+  },
+  {
+    "name": "HEYBLU",
+    "patterns": [
+      {
+        "field": "details",
+        "value": "HEYBLU IFN SA"
+      }
+    ]
+  },
+  {
+    "name": "AVV CREATION",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "AVV CREATION IT"
+      }
+    ]
+  },
+  {
+    "name": "PIZZA CAPU CAMPULUI",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "BOSINCEANU VICTOR SRL RO"
+      }
+    ]
+  },
+  {
+    "name": "DOUGLAS",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "Parfumerie Douglas SRL RO"
+      }
+    ]
+  },
+  {
+    "name": "APPLE",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "APPLE.COM/BILL IE"
+      }
+    ]
+  },
+  {
+    "name": "TRANSFER IN FAMILIE",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "andrei frate"
+      }
+    ]
+  },
+  {
+    "name": "NETFLIX",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "NETFLIX INTERNATIONAL"
+      }
+    ]
+  },
+  {
+    "name": "DS DAMAT",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "DS DAMAT RO"
+      }
+    ]
+  },
+  {
+    "name": "UDEMY",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "UDEMY: ONLINE COURSES"
+      }
+    ]
+  },
+  {
+    "name": "BROWNERIE",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "brownerie.ro"
+      }
+    ]
+  },
+  {
+    "name": "PPC ENERGIE",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "PPC ENERGIE SA RO"
+      }
+    ]
+  },
+  {
+    "name": "CARTURESTI",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "CARTURESTI COTROCENI"
+      }
+    ]
+  },
+  {
+    "name": "STB",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "STB SA"
+      }
+    ]
+  },
+  {
+    "name": "AEROPORT OTOPENI",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "AEROP OTOPENI-UNATTE"
+      }
+    ]
+  },
+  {
+    "name": "YouTubePremium",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "YouTubePremium"
+      }
+    ]
+  },
+  {
+    "name": "ZEINA KEBAB",
+    "patterns": [
+      {
+        "field": "location",
+        "value": "ZEINA GIULESTI"
+      }
     ]
   }
 ]
