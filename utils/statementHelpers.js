@@ -33,7 +33,8 @@ const { REV_BANK_ID, BT_BANK_ID, ING_BANK_ID } = require("./constants");
 const { normalizeCounterparty } = require("./counterpartiesHelpers");
 
 function formatTrasactionObject(transaction, RULES) {
-  const counterparty = normalizeCounterparty(transaction, RULES);
+  const counterpartyId = normalizeCounterparty(transaction, RULES);
+  const tag = counterpartyId ? RULES.find(rule => rule.name === counterpartyId)?.tag || "" : "";
 
   return {
     proprietaryBankTransactionCode: transaction.name || "Unknown",
@@ -42,9 +43,10 @@ function formatTrasactionObject(transaction, RULES) {
     details: transaction.details || [],
     transactionId: transaction.reference || null,
     counterparty: {
-      id: counterparty,
-      description: counterparty === "Unknown" ? transaction.location || "" : "",
+      id: counterpartyId,
+      description: !counterpartyId ? transaction.location || "" : "",
     },
+    tag: tag,
     internalTransactionId: randomUUID(),
   };
 }
@@ -303,17 +305,17 @@ const parseStatement = async (filePath, fileName) => {
     formatTrasactionObject(transaction, RULES)
   );
 
-  console.log(
-    JSON.stringify({
-      statementBank,
-      statementCurrency,
-      statementDates,
-      statementInitialBalance,
-      statementFinalBalance,
-      statementIBAN,
-      // transactions
-    })
-  );
+  // console.log(
+  //   JSON.stringify({
+  //     statementBank,
+  //     statementCurrency,
+  //     statementDates,
+  //     statementInitialBalance,
+  //     statementFinalBalance,
+  //     statementIBAN,
+  //     // transactions
+  //   })
+  // );
 
   const stats = {
     income: {
@@ -326,8 +328,8 @@ const parseStatement = async (filePath, fileName) => {
       count: transactions.filter(transaction => transaction.transactionAmount.amount < 0).length,
       total: transactions.filter(transaction => transaction.transactionAmount.amount < 0).reduce((acc, transaction) => acc + parseLocaleNumber(transaction.transactionAmount.amount), 0).toFixed(2),
     },
-    counterparties: calculateCounterpartiesStats(transactions),
-    tags: calculateTagsStats(transactions, RULES),
+    // counterparties: calculateCounterpartiesStats(transactions),
+    // tags: calculateTagsStats(transactions, RULES),
   };
 
   let out = {};
@@ -338,9 +340,10 @@ const parseStatement = async (filePath, fileName) => {
       dates: statementDates,
       initialBalance: statementInitialBalance,
       finalBalance: statementFinalBalance,
-      validCheckSumBalance: validateTransactionsCheckSum(statementFinalBalance, statementInitialBalance, transactions)
+      validCheckSumBalance: validateTransactionsCheckSum(statementFinalBalance, statementInitialBalance, transactions),
+      // transactionsCount: transactions.length,
     },
-    stats: stats,
+    // stats: stats,
     transactions: transactions,
   };
 
@@ -384,7 +387,21 @@ const analyzeFolder = async (folderPath) => {
   return results;
 };
 
+const getStatementOutputFileName = (statementJson) => {
+  let iban = Object.keys(statementJson)[0];
+  if (!iban) {
+    throw new Error("No IBAN found in the statement JSON");
+  }
+
+  let dateElements = statementJson[iban].meta.dates.endDate.split("-");
+  let bank = statementJson[iban].meta.bank;
+  let currency = statementJson[iban].meta.currency;
+
+  return `${dateElements[0]}_${dateElements[1]}_${bank}_${currency}_${iban}.json`;
+};
+
 module.exports = {
   parseStatement,
   analyzeFolder,
+  getStatementOutputFileName
 };

@@ -1,0 +1,32 @@
+[
+    {
+        "code": "O",
+        "name": "Operationale",
+        "patterns": [],
+        "counterparties": []
+    },
+    {
+        "code": "D",
+        "name": "Dorinte",
+        "patterns": [],
+        "counterparties": []
+    },
+    {
+        "code": "I",
+        "name": "Investitii",
+        "patterns": [],
+        "counterparties": []
+    },
+    {
+        "code": "E",
+        "name": "Economii",
+        "patterns": [],
+        "counterparties": []
+    },
+    {
+        "code": "V",
+        "name": "Venituri",
+        "patterns": [],
+        "counterparties": []
+    }
+]
